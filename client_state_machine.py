@@ -150,8 +150,7 @@ class ClientSM:
                     self.out_msg += "(" + peer_msg + " joined)\n"
                 else:
                     spltmsg = peer_msg.split(":")
-                    direction = str(spltmsg[1])
-                    world.players[self.peer].changeDirection(direction)
+                    world.players[spltmsg[0]].changeDirection(spltmsg[1])
                     self.out_msg += peer_msg
 
             # I got bumped out
