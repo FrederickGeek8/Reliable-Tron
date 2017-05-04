@@ -4,6 +4,7 @@ Created on Sun Apr  5 00:00:32 2015
 
 @author: zhengzhang
 """
+import pygame
 from chat_utils import *
 
 class ClientSM:
@@ -16,16 +17,16 @@ class ClientSM:
 
     def set_state(self, state):
         self.state = state
-        
+
     def get_state(self):
         return self.state
-    
+
     def set_myname(self, name):
         self.me = name
 
     def get_myname(self):
         return self.me
-        
+
     def connect_to(self, peer):
         msg = M_CONNECT + peer
         mysend(self.s, msg)
@@ -48,7 +49,7 @@ class ClientSM:
         self.out_msg += 'You are disconnected from ' + self.peer + '\n'
         self.peer = ''
 
-    def proc(self, my_msg, peer_code, peer_msg):
+    def proc(self, my_msg, peer_code, peer_msg, world):
         self.out_msg = ''
 #==============================================================================
 # Once logged in, do a few things: get peer listing, connect, search
@@ -58,22 +59,22 @@ class ClientSM:
         if self.state == S_LOGGEDIN:
             # todo: can't deal with multiple lines yet
             if len(my_msg) > 0:
-                
+
                 if my_msg == 'q':
                     self.out_msg += 'See you next time!\n'
                     self.state = S_OFFLINE
-                    
+
                 elif my_msg == 'time':
                     mysend(self.s, M_TIME)
                     time_in = myrecv(self.s)
                     self.out_msg += "Time is: " + time_in
-                            
+
                 elif my_msg == 'who':
                     mysend(self.s, M_LIST)
                     logged_in = myrecv(self.s)
                     self.out_msg += 'Here are all the users in the system:\n'
                     self.out_msg += logged_in
-                            
+
                 elif my_msg[0] == 'c':
                     peer = my_msg[1:]
                     peer = peer.strip()
@@ -81,9 +82,11 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
+                        world.addPlayer(self.peer)
+                        world.addPlayer(self.me)
                     else:
                         self.out_msg += 'Connection unsuccessful\n'
-                        
+
                 elif my_msg[0] == '?':
                     term = my_msg[1:].strip()
                     mysend(self.s, M_SEARCH + term)
@@ -92,7 +95,7 @@ class ClientSM:
                         self.out_msg += search_rslt + '\n\n'
                     else:
                         self.out_msg += '\'' + term + '\'' + ' not found\n\n'
-                        
+
                 elif my_msg[0] == 'p':
                     poem_idx = my_msg[1:].strip()
                     mysend(self.s, M_POEM + poem_idx)
@@ -104,21 +107,38 @@ class ClientSM:
 
                 else:
                     self.out_msg += menu
-                    
+
             if len(peer_msg) > 0:
                 if peer_code == M_CONNECT:
                     self.peer = peer_msg
                     self.out_msg += 'Request from ' + self.peer + '\n'
-                    self.out_msg += 'You are connected with ' + self.peer 
+                    self.out_msg += 'You are connected with ' + self.peer
                     self.out_msg += '. Chat away!\n\n'
                     self.out_msg += '------------------------------------\n'
+                    world.addPlayer(self.me)
+                    world.addPlayer(self.peer)
                     self.state = S_CHATTING
-                    
+
 #==============================================================================
 # Start chatting, 'bye' for quit
 # This is event handling instate "S_CHATTING"
 #==============================================================================
         elif self.state == S_CHATTING:
+            pressed = pygame.key.get_pressed()
+
+            if pressed[pygame.K_a]:
+                world.players[self.me].changeDirection('left')
+                mysend(self.s, M_EXCHANGE + self.me + ":left")
+            if pressed[pygame.K_d]:
+                world.players[self.me].changeDirection('right')
+                mysend(self.s, M_EXCHANGE + self.me + ":right")
+            if pressed[pygame.K_w]:
+                world.players[self.me].changeDirection('up')
+                mysend(self.s, M_EXCHANGE + self.me + ":up")
+            if pressed[pygame.K_s]:
+                world.players[self.me].changeDirection('down')
+                mysend(self.s, M_EXCHANGE + self.me + ":down")
+            world.tick()
             if len(my_msg) > 0:     # my stuff going out
                 mysend(self.s, M_EXCHANGE + "[" + self.me + "] " + my_msg)
                 if my_msg == 'bye':
@@ -129,6 +149,9 @@ class ClientSM:
                 if peer_code == M_CONNECT:
                     self.out_msg += "(" + peer_msg + " joined)\n"
                 else:
+                    spltmsg = peer_msg.split(":")
+                    direction = str(spltmsg[1])
+                    world.players[self.peer].changeDirection(direction)
                     self.out_msg += peer_msg
 
             # I got bumped out
@@ -139,10 +162,10 @@ class ClientSM:
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu
 #==============================================================================
-# invalid state                       
+# invalid state
 #==============================================================================
         else:
             self.out_msg += 'How did you wind up here??\n'
             print_state(self.state)
-            
+
         return self.out_msg
