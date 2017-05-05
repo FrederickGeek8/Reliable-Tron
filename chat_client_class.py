@@ -112,8 +112,8 @@ class Client:
     def drawGrid(self):
         for y in range(WINHEIGHT // GRID_SIZE):
             for x in range(WINWIDTH // GRID_SIZE):
-                rect = pygame.Rect(x * (GRID_SIZE + 1), y *
-                                   (GRID_SIZE + 1), GRID_SIZE, GRID_SIZE)
+                rect = pygame.Rect(x * (GRID_SIZE + 1), y * (GRID_SIZE + 1),
+                                   GRID_SIZE, GRID_SIZE)
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
@@ -159,9 +159,9 @@ class Client:
         my_msg, peer_code, peer_msg = self.get_msgs()
         self.system_msg += self.sm.proc(my_msg, peer_code, peer_msg, WORLD)
         WORLD.draw()
-        if WORLD.getWinner() is not None:
+        if WORLD.getWinner() != None:
             myfont = pygame.font.SysFont("monospace", 50)
             label = myfont.render(
                 WORLD.getWinner() + " wins! Connect to play again.", 1,
-                (0, 0, 0))
+                (0, 0, 0), (255, 255, 255))
             DISPLAYSURF.blit(label, (100, 100))
