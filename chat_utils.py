@@ -1,5 +1,7 @@
 import socket
 import time
+import sys
+import sysconfig
 
 M_UNDEF     = '0'
 M_LOGIN     = '1'

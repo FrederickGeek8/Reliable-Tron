@@ -13,7 +13,7 @@ FPS = 30
 WINWIDTH = 1280
 WINHEIGHT = 720
 
-GRID_SIZE = 4
+GRID_SIZE = 9
 
 
 class Client:
