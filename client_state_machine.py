@@ -127,6 +127,7 @@ class ClientSM:
 # This is event handling instate "S_CHATTING"
 #==============================================================================
         elif self.state == S_CHATTING:
+            pygame.event.pump()
             pressed = pygame.key.get_pressed()
 
             if pressed[pygame.K_a]:
