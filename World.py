@@ -17,16 +17,15 @@ class World():
 
     def tick(self):
         self.trails = []
-        for key in self.players:
-            if (self.players[key].x, self.players[key].y) in self.trails:
-                self.players[key].die()
 
         for key in self.players:
             self.players[key].tick()
             self.trails += self.players[key].getSteps()
 
         # Check for collisions
-
+        for key in self.players:
+            if (self.players[key].x, self.players[key].y) in self.trails:
+                self.players[key].die()
 
 
     def draw(self):

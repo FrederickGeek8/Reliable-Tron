@@ -15,6 +15,7 @@ class Player():
         self.direction = direction
 
     def tick(self):
+        self.steps.append((self.x, self.y))
         if self.direction == "up":
             self.y -= 1
         elif self.direction == "down":
@@ -24,7 +25,6 @@ class Player():
         elif self.direction == "right":
             self.x += 1
 
-        self.steps.append((self.x, self.y))
 
     def die(self):
         self.steps = []
