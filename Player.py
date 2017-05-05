@@ -3,6 +3,8 @@ import pygame
 
 class Player():
     def __init__(self, x, y, color):
+        self.initialX = x
+        self.initialY = y
         self.x = x
         self.y = y
         self.steps = []
@@ -29,9 +31,17 @@ class Player():
         elif self.direction == "right":
             self.x += 1
 
+    def isDead(self):
+        return self.direction is None
 
     def die(self):
         self.steps = []
         self.x = -1
         self.y = -1
         self.direction = None
+
+    def reset(self):
+        self.x = self.initialX
+        self.y = self.initialY
+        self.steps = []
+        self.direction = "left"

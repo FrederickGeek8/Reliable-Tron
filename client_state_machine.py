@@ -85,6 +85,7 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
+                        world.reset()
                         world.addPlayer(self.peer, OTHER_COLOR)
                         world.addPlayer(self.me, ME_COLOR)
                     else:
@@ -118,6 +119,7 @@ class ClientSM:
                     self.out_msg += 'You are connected with ' + self.peer
                     self.out_msg += '. Chat away!\n\n'
                     self.out_msg += '------------------------------------\n'
+                    world.reset()
                     world.addPlayer(self.me, ME_COLOR)
                     world.addPlayer(self.peer, OTHER_COLOR)
                     self.state = S_CHATTING
@@ -142,7 +144,17 @@ class ClientSM:
             if pressed[pygame.K_s]:
                 if world.players[self.me].changeDirection('down'):
                     mysend(self.s, M_EXCHANGE + self.me + ":down")
+
+            if pressed[pygame.K_RETURN]:
+                mysend(self.s, M_EXCHANGE + "start")
+
             world.tick()
+
+            if world.getWinner() != None:
+                self.disconnect()
+                self.state = S_LOGGEDIN
+                self.peer = ''
+
             if len(my_msg) > 0:     # my stuff going out
                 mysend(self.s, M_EXCHANGE + "[" + self.me + "] " + my_msg)
                 if my_msg == 'bye':
@@ -153,12 +165,17 @@ class ClientSM:
                 if peer_code == M_CONNECT:
                     self.out_msg += "(" + peer_msg + " joined)\n"
                 else:
-                    spltmsg = peer_msg.split(":")
-                    world.players[spltmsg[0]].changeDirection(spltmsg[1])
+                    if peer_msg == "start":
+                        world.start()
+                    else:
+                        spltmsg = peer_msg.split(":")
+                        world.players[spltmsg[0]].changeDirection(spltmsg[1])
                     self.out_msg += peer_msg
 
             # I got bumped out
             if peer_code == M_DISCONNECT:
+                while world.getWinner() == None:
+                    world.tick()
                 self.state = S_LOGGEDIN
 
             # Display the menu again

@@ -13,7 +13,8 @@ FPS = 30
 WINWIDTH = 1280
 WINHEIGHT = 720
 
-GRID_SIZE = 9
+GRID_SIZE = 4
+
 
 class Client:
     def __init__(self):
@@ -32,7 +33,7 @@ class Client:
         return self.name
 
     def init_chat(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM )
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # if len(argv) > 1, we assume they're giving an IP address to connect to
         # else, use the localhost as defined in chat_utils.py
@@ -82,9 +83,9 @@ class Client:
             msg = M_LOGIN + self.name
             self.send(msg)
             response = self.recv()
-            if response == M_LOGIN+'ok':
+            if response == M_LOGIN + 'ok':
                 self.state = S_LOGGEDIN
-# zz: change!
+                # zz: change!
                 self.sm.set_state(S_LOGGEDIN)
                 self.sm.set_myname(self.name)
                 self.print_instructions()
@@ -92,18 +93,18 @@ class Client:
             elif response == M_LOGIN + 'duplicate':
                 self.system_msg += 'Duplicate username, try again'
                 return False
-        else:               # fix: dup is only one of the reasons
-           return(False)
-
+        else:  # fix: dup is only one of the reasons
+            return (False)
 
     def read_input(self):
-        while True:         # uncomment the below for a stress test
-#            if self.state == S_CHATTING:
-#                text = 'adfadsfafd' + self.name
-#                time.sleep(2)
-#            else:
+        while True:  # uncomment the below for a stress test
+            #            if self.state == S_CHATTING:
+            #                text = 'adfadsfafd' + self.name
+            #                time.sleep(2)
+            #            else:
             text = sys.stdin.readline()[:-1]
-            self.console_input.append(text) # no need for lock, append is thread safe
+            self.console_input.append(
+                text)  # no need for lock, append is thread safe
 
     def print_instructions(self):
         self.system_msg += menu
@@ -111,7 +112,8 @@ class Client:
     def drawGrid(self):
         for y in range(WINHEIGHT // GRID_SIZE):
             for x in range(WINWIDTH // GRID_SIZE):
-                rect = pygame.Rect(x*(GRID_SIZE+1), y*(GRID_SIZE+1), GRID_SIZE, GRID_SIZE)
+                rect = pygame.Rect(x * (GRID_SIZE + 1), y *
+                                   (GRID_SIZE + 1), GRID_SIZE, GRID_SIZE)
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
@@ -132,13 +134,14 @@ class Client:
 
         FPSCLOCK = pygame.time.Clock()
 
+        pygame.display.set_caption(self.get_name())
+
         WORLD = World(GRID_SIZE, DISPLAYSURF)
         while self.sm.get_state() != S_OFFLINE:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
 
             self.proc()
             self.output()
@@ -150,8 +153,15 @@ class Client:
 #==============================================================================
 # main processing loop
 #==============================================================================
+
     def proc(self):
         self.drawGrid()
         my_msg, peer_code, peer_msg = self.get_msgs()
         self.system_msg += self.sm.proc(my_msg, peer_code, peer_msg, WORLD)
         WORLD.draw()
+        if WORLD.getWinner() != None:
+            myfont = pygame.font.SysFont("monospace", 50)
+            label = myfont.render(
+                WORLD.getWinner() + " wins! Connect to play again.", 1,
+                (0, 0, 0))
+            DISPLAYSURF.blit(label, (100, 100))

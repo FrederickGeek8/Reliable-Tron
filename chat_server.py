@@ -113,7 +113,11 @@ class Server:
                 said = msg[1:]
                 # said2 = text_proc(said, from_name)
                 # self.indices[from_name].add_msg_and_index(said2)
-                for g in the_guys[1:]:
+                if said == "start":
+                    people = the_guys[:]
+                else:
+                    people = the_guys[1:]
+                for g in people:
                     to_sock = self.logged_name2sock[g]
                     # self.indices[g].add_msg_and_index(said2)
                     mysend(to_sock, msg)
