@@ -142,7 +142,7 @@ class Client:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-
+            DISPLAYSURF.fill((0, 0, 0))
             self.proc()
             self.output()
             # time.sleep(CHAT_WAIT)
