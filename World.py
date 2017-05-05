@@ -42,6 +42,9 @@ class World():
         if len(livingPlayers) == 1:
             return livingPlayers[0]
 
+        if len(livingPlayers) == 0:
+            return "No one"  # No one wins!
+
         return None
 
     def tick(self):

@@ -159,7 +159,7 @@ class Client:
         my_msg, peer_code, peer_msg = self.get_msgs()
         self.system_msg += self.sm.proc(my_msg, peer_code, peer_msg, WORLD)
         WORLD.draw()
-        if WORLD.getWinner() != None:
+        if WORLD.getWinner() is not None:
             myfont = pygame.font.SysFont("monospace", 50)
             label = myfont.render(
                 WORLD.getWinner() + " wins! Connect to play again.", 1,
