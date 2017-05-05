@@ -7,6 +7,9 @@ Created on Sun Apr  5 00:00:32 2015
 import pygame
 from chat_utils import *
 
+ME_COLOR = (0, 191, 255)
+OTHER_COLOR = (255,165,0)
+
 class ClientSM:
     def __init__(self, s):
         self.state = S_OFFLINE
@@ -82,8 +85,8 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
-                        world.addPlayer(self.peer)
-                        world.addPlayer(self.me)
+                        world.addPlayer(self.peer, OTHER_COLOR)
+                        world.addPlayer(self.me, ME_COLOR)
                     else:
                         self.out_msg += 'Connection unsuccessful\n'
 
@@ -115,8 +118,8 @@ class ClientSM:
                     self.out_msg += 'You are connected with ' + self.peer
                     self.out_msg += '. Chat away!\n\n'
                     self.out_msg += '------------------------------------\n'
-                    world.addPlayer(self.me)
-                    world.addPlayer(self.peer)
+                    world.addPlayer(self.me, ME_COLOR)
+                    world.addPlayer(self.peer, OTHER_COLOR)
                     self.state = S_CHATTING
 
 #==============================================================================
@@ -127,17 +130,17 @@ class ClientSM:
             pressed = pygame.key.get_pressed()
 
             if pressed[pygame.K_a]:
-                world.players[self.me].changeDirection('left')
-                mysend(self.s, M_EXCHANGE + self.me + ":left")
+                if world.players[self.me].changeDirection('left'):
+                    mysend(self.s, M_EXCHANGE + self.me + ":left")
             if pressed[pygame.K_d]:
-                world.players[self.me].changeDirection('right')
-                mysend(self.s, M_EXCHANGE + self.me + ":right")
+                if world.players[self.me].changeDirection('right'):
+                    mysend(self.s, M_EXCHANGE + self.me + ":right")
             if pressed[pygame.K_w]:
-                world.players[self.me].changeDirection('up')
-                mysend(self.s, M_EXCHANGE + self.me + ":up")
+                if world.players[self.me].changeDirection('up'):
+                    mysend(self.s, M_EXCHANGE + self.me + ":up")
             if pressed[pygame.K_s]:
-                world.players[self.me].changeDirection('down')
-                mysend(self.s, M_EXCHANGE + self.me + ":down")
+                if world.players[self.me].changeDirection('down'):
+                    mysend(self.s, M_EXCHANGE + self.me + ":down")
             world.tick()
             if len(my_msg) > 0:     # my stuff going out
                 mysend(self.s, M_EXCHANGE + "[" + self.me + "] " + my_msg)

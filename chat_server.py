@@ -111,7 +111,7 @@ class Server:
                 from_name = self.logged_sock2name[from_sock]
                 the_guys = self.group.list_me(from_name)
                 said = msg[1:]
-                said2 = text_proc(said, from_name)
+                # said2 = text_proc(said, from_name)
                 # self.indices[from_name].add_msg_and_index(said2)
                 for g in the_guys[1:]:
                     to_sock = self.logged_name2sock[g]

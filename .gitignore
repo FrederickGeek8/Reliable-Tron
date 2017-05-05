@@ -122,3 +122,4 @@ ENV/
 
 # mkdocs documentation
 /site
+*.idx

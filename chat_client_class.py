@@ -17,15 +17,6 @@ GRID_SIZE = 9
 
 class Client:
     def __init__(self):
-        global DISPLAYSURF, FPSCLOCK, WORLD
-        pygame.init()
-        FPSCLOCK = pygame.time.Clock()
-
-        DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
-
-        FPSCLOCK = pygame.time.Clock()
-
-        WORLD = World(GRID_SIZE, DISPLAYSURF)
         self.peer = ''
         self.console_input = []
         self.state = S_OFFLINE
@@ -124,6 +115,7 @@ class Client:
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
+        global DISPLAYSURF, FPSCLOCK, WORLD
         self.init_chat()
         self.system_msg += 'Welcome to ICS chat\n'
         self.system_msg += 'Please enter your name: '
@@ -132,10 +124,20 @@ class Client:
             self.output()
         self.system_msg += 'Welcome, ' + self.get_name() + '!'
         self.output()
+
+        pygame.init()
+        FPSCLOCK = pygame.time.Clock()
+
+        DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
+
+        FPSCLOCK = pygame.time.Clock()
+
+        WORLD = World(GRID_SIZE, DISPLAYSURF)
         while self.sm.get_state() != S_OFFLINE:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    terminate()
+                    pygame.quit()
+                    sys.exit()
 
 
             self.proc()

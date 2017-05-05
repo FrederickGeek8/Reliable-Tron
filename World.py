@@ -10,10 +10,12 @@ class World():
         self.trails = []
         self.gridSize = gridSize
         self.display = display
+        self.dimensions = (self.display.get_size()[0] // (self.gridSize + 1),
+        self.display.get_size()[1] // (self.gridSize + 1))
 
-    def addPlayer(self, name):
+    def addPlayer(self, name, color):
         if name not in self.players:
-            self.players[name] = Player(5, random.randint(1, 720 // self.gridSize))
+            self.players[name] = Player(5, random.randint(1, 720 // self.gridSize), color)
 
     def tick(self):
         self.trails = []
@@ -24,7 +26,10 @@ class World():
 
         # Check for collisions
         for key in self.players:
-            if (self.players[key].x, self.players[key].y) in self.trails:
+            if ((self.players[key].x, self.players[key].y) in self.trails or
+                self.players[key].x < 0 or self.players[key].y < 0
+                or self.players[key].x > self.dimensions[0]
+                or self.players[key].y > self.dimensions[1]):
                 self.players[key].die()
 
 
@@ -34,10 +39,10 @@ class World():
                 x, y = step
                 rect = pygame.Rect(x * (self.gridSize + 1), y * (
                     self.gridSize + 1), self.gridSize, self.gridSize)
-                pygame.draw.rect(self.display, (134, 63, 54), rect)
+                pygame.draw.rect(self.display, self.players[key].color, rect)
 
             rect = pygame.Rect(self.players[key].x *
                                (self.gridSize + 1), self.players[key].y *
                                (self.gridSize + 1
                                 ), self.gridSize, self.gridSize)
-            pygame.draw.rect(self.display, (134, 63, 54), rect)
+            pygame.draw.rect(self.display, self.players[key].color, rect)
