@@ -14,8 +14,13 @@ M_LIST      = '7'
 M_POEM      = '8'
 M_TIME      = '9'
 
-CHAT_IP = ''    #for Mac
-#CHAT_IP = socket.gethostname()  #for PC
+if sys.platform == "darwin":
+    CHAT_IP = ''    #for Mac
+    if '--enable-framework' not in sysconfig.get_config_vars()['CONFIG_ARGS']:
+        print("Error: Python not installed as framework. Please use proper Python version.")
+else:
+    CHAT_IP = socket.gethostname()  #for PC
+
 CHAT_PORT = 1112
 SERVER = (CHAT_IP, CHAT_PORT)
 
