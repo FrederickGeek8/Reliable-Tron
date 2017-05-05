@@ -26,7 +26,7 @@ class Server:
         self.sonnet_f = open('AllSonnets.txt.idx', 'rb')
         self.sonnet = pkl.load(self.sonnet_f)
         self.sonnet_f.close()
-        
+
     def new_client(self, sock):
         #add to all sockets and to new clients
         print('new client...')
@@ -80,10 +80,10 @@ class Server:
 # main command switchboard
 #==============================================================================
     def handle_msg(self, from_sock):
-        #read msg code 
+        #read msg code
         msg = myrecv(from_sock)
         if len(msg) > 0:
-            code = msg[0]           
+            code = msg[0]
 #==============================================================================
 # handle connect request
 #==============================================================================
@@ -105,17 +105,17 @@ class Server:
                     msg = M_CONNECT + 'no_user'
                 mysend(from_sock, msg)
 #==============================================================================
-# handle message exchange   
+# handle message exchange
 #==============================================================================
             elif code == M_EXCHANGE:
                 from_name = self.logged_sock2name[from_sock]
                 the_guys = self.group.list_me(from_name)
                 said = msg[1:]
                 said2 = text_proc(said, from_name)
-                self.indices[from_name].add_msg_and_index(said2)
+                # self.indices[from_name].add_msg_and_index(said2)
                 for g in the_guys[1:]:
                     to_sock = self.logged_name2sock[g]
-                    self.indices[g].add_msg_and_index(said2)                
+                    # self.indices[g].add_msg_and_index(said2)
                     mysend(to_sock, msg)
 #==============================================================================
 #listing available peers
@@ -169,7 +169,7 @@ class Server:
                 self.logout(from_sock)
         else:
             #client died unexpectedly
-            self.logout(from_sock)   
+            self.logout(from_sock)
 
 #==============================================================================
 # main loop, loops *forever*
@@ -191,7 +191,7 @@ class Server:
                #new client request
                sock, address=self.server.accept()
                self.new_client(sock)
-           
+
 def main():
     server=Server()
     server.run()
