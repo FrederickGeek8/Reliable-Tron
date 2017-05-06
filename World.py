@@ -1,17 +1,18 @@
 from Player import Player
+import game_config as gc
+import random
 import pygame
 import math
 
 
 class World():
-    def __init__(self, gridSize, display):
+    def __init__(self, display):
         self.players = {}
         self.trails = []
-        self.gridSize = gridSize
         self.started = False
         self.display = display
-        self.dimensions = (self.display.get_size()[0] // (self.gridSize + 1),
-                           self.display.get_size()[1] // (self.gridSize + 1))
+        self.dimensions = (self.display.get_size()[0] // (gc.GRID_SIZE + 1),
+                           self.display.get_size()[1] // (gc.GRID_SIZE + 1))
 
     def addPlayer(self, name, color):
         if name not in self.players:
@@ -39,13 +40,24 @@ class World():
             if not self.players[key].isDead():
                 livingPlayers.append(key)
 
-        if len(livingPlayers) == 1:
+        if len(livingPlayers) == 1 and self.started:
             return livingPlayers[0]
 
         if len(livingPlayers) == 0 and self.started:
             return "No one"  # No one wins!
 
         return None
+
+    def interpretPos(self, myname, posdict):
+        self.players = {}
+        for key in posdict:
+            x, y = posdict[key]
+            if key == myname:
+                color = (0, 191, 255)
+            else:
+                color = (random.randint(1, 255), random.randint(1, 255),
+                         random.randint(1, 255))
+            self.players[key] = Player(x, y, color)
 
     def tick(self):
         if self.started:
@@ -68,11 +80,11 @@ class World():
         for key in self.players:
             for step in self.players[key].getSteps():
                 x, y = step
-                rect = pygame.Rect(x * (self.gridSize + 1), y * (
-                    self.gridSize + 1), self.gridSize, self.gridSize)
+                rect = pygame.Rect(x * (gc.GRID_SIZE + 1), y * (
+                    gc.GRID_SIZE + 1), gc.GRID_SIZE, gc.GRID_SIZE)
                 pygame.draw.rect(self.display, self.players[key].color, rect)
 
-            rect = pygame.Rect(self.players[key].x * (self.gridSize + 1),
-                               self.players[key].y * (self.gridSize + 1),
-                               self.gridSize, self.gridSize)
+            rect = pygame.Rect(self.players[key].x * (gc.GRID_SIZE + 1),
+                               self.players[key].y * (gc.GRID_SIZE + 1),
+                               gc.GRID_SIZE, gc.GRID_SIZE)
             pygame.draw.rect(self.display, self.players[key].color, rect)

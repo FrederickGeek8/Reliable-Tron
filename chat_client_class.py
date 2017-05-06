@@ -3,17 +3,11 @@ import socket
 import select
 import sys
 import pygame
+import game_config as gc
 from World import World
 from chat_utils import *
 import client_state_machine as csm
-
 import threading
-
-FPS = 30
-WINWIDTH = 1280
-WINHEIGHT = 720
-
-GRID_SIZE = 9
 
 
 class Client:
@@ -110,10 +104,10 @@ class Client:
         self.system_msg += menu
 
     def drawGrid(self):
-        for y in range(WINHEIGHT // GRID_SIZE):
-            for x in range(WINWIDTH // GRID_SIZE):
-                rect = pygame.Rect(x * (GRID_SIZE + 1), y * (GRID_SIZE + 1),
-                                   GRID_SIZE, GRID_SIZE)
+        for y in range(gc.WINHEIGHT // gc.GRID_SIZE):
+            for x in range(gc.WINWIDTH // gc.GRID_SIZE):
+                rect = pygame.Rect(x * (gc.GRID_SIZE + 1), y * (gc.GRID_SIZE + 1),
+                                   gc.GRID_SIZE, gc.GRID_SIZE)
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
@@ -130,13 +124,13 @@ class Client:
         pygame.init()
         FPSCLOCK = pygame.time.Clock()
 
-        DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
+        DISPLAYSURF = pygame.display.set_mode((gc.WINWIDTH, gc.WINHEIGHT))
 
         FPSCLOCK = pygame.time.Clock()
 
         pygame.display.set_caption(self.get_name())
 
-        WORLD = World(GRID_SIZE, DISPLAYSURF)
+        WORLD = World(DISPLAYSURF)
         while self.sm.get_state() != S_OFFLINE:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -147,7 +141,7 @@ class Client:
             self.output()
             # time.sleep(CHAT_WAIT)
             pygame.display.update()
-            FPSCLOCK.tick(15)
+            FPSCLOCK.tick(gc.FPS)
         self.quit()
 
 #==============================================================================

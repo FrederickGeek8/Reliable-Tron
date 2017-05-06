@@ -5,10 +5,10 @@ Created on Sun Apr  5 00:00:32 2015
 @author: zhengzhang
 """
 import pygame
+import random
+import ast
 from chat_utils import *
 
-ME_COLOR = (0, 191, 255)
-OTHER_COLOR = (255,165,0)
 
 class ClientSM:
     def __init__(self, s):
@@ -34,9 +34,9 @@ class ClientSM:
         msg = M_CONNECT + peer
         mysend(self.s, msg)
         response = myrecv(self.s)
-        if response == (M_CONNECT+'ok'):
+        if response == (M_CONNECT + 'ok'):
             self.peer = peer
-            self.out_msg += 'You are connected with '+ self.peer + '\n'
+            self.out_msg += 'You are connected with ' + self.peer + '\n'
             return (True)
         elif response == (M_CONNECT + 'busy'):
             self.out_msg += 'User is busy. Please try again later\n'
@@ -44,7 +44,7 @@ class ClientSM:
             self.out_msg += 'Cannot talk to yourself (sick)\n'
         else:
             self.out_msg += 'User is not online, try again later\n'
-        return(False)
+        return (False)
 
     def disconnect(self):
         msg = M_DISCONNECT
@@ -54,11 +54,11 @@ class ClientSM:
 
     def proc(self, my_msg, peer_code, peer_msg, world):
         self.out_msg = ''
-#==============================================================================
-# Once logged in, do a few things: get peer listing, connect, search
-# And, of course, if you are so bored, just go
-# This is event handling instate "S_LOGGEDIN"
-#==============================================================================
+        #==============================================================================
+        # Once logged in, do a few things: get peer listing, connect, search
+        # And, of course, if you are so bored, just go
+        # This is event handling instate "S_LOGGEDIN"
+        #==============================================================================
         if self.state == S_LOGGEDIN:
             # todo: can't deal with multiple lines yet
             if len(my_msg) > 0:
@@ -85,9 +85,6 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
-                        world.reset()
-                        world.addPlayer(self.peer, OTHER_COLOR)
-                        world.addPlayer(self.me, ME_COLOR)
                     else:
                         self.out_msg += 'Connection unsuccessful\n'
 
@@ -114,14 +111,16 @@ class ClientSM:
 
             if len(peer_msg) > 0:
                 if peer_code == M_CONNECT:
+                    """
                     self.peer = peer_msg
                     self.out_msg += 'Request from ' + self.peer + '\n'
                     self.out_msg += 'You are connected with ' + self.peer
                     self.out_msg += '. Chat away!\n\n'
                     self.out_msg += '------------------------------------\n'
-                    world.reset()
-                    world.addPlayer(self.me, ME_COLOR)
-                    world.addPlayer(self.peer, OTHER_COLOR)
+                    """
+                    print(peer_msg)
+                    posdict = ast.literal_eval(peer_msg)
+                    world.interpretPos(self.me, posdict)
                     self.state = S_CHATTING
 
 #==============================================================================
@@ -155,21 +154,22 @@ class ClientSM:
                 self.state = S_LOGGEDIN
                 self.peer = ''
 
-            if len(my_msg) > 0:     # my stuff going out
+            if len(my_msg) > 0:  # my stuff going out
                 mysend(self.s, M_EXCHANGE + "[" + self.me + "] " + my_msg)
                 if my_msg == 'bye':
                     self.disconnect()
                     self.state = S_LOGGEDIN
                     self.peer = ''
-            if len(peer_msg) > 0:    # peer's stuff, coming in
+            if len(peer_msg) > 0:  # peer's stuff, coming in
                 if peer_code == M_CONNECT:
-                    self.out_msg += "(" + peer_msg + " joined)\n"
+                    posdict = ast.literal_eval(peer_msg)
+                    world.interpretPos(self.me, posdict)
+                    print(posdict)
+                elif peer_code == M_START:
+                    world.start()
                 else:
-                    if peer_msg == "start":
-                        world.start()
-                    else:
-                        spltmsg = peer_msg.split(":")
-                        world.players[spltmsg[0]].changeDirection(spltmsg[1])
+                    spltmsg = peer_msg.split(":")
+                    world.players[spltmsg[0]].changeDirection(spltmsg[1])
                     self.out_msg += peer_msg
 
             # I got bumped out
@@ -181,6 +181,7 @@ class ClientSM:
             # Display the menu again
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu
+
 #==============================================================================
 # invalid state
 #==============================================================================

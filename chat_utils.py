@@ -13,6 +13,8 @@ M_SEARCH    = '6'
 M_LIST      = '7'
 M_POEM      = '8'
 M_TIME      = '9'
+M_START     = 'a'
+M_POS       = 'b'
 
 if sys.platform == "darwin":
     CHAT_IP = ''    #for Mac
