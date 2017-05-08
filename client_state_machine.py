@@ -7,6 +7,8 @@ Created on Sun Apr  5 00:00:32 2015
 import pygame
 import random
 import ast
+import string
+import random
 from chat_utils import *
 
 
@@ -51,7 +53,28 @@ class ClientSM:
         mysend(self.s, msg)
         self.out_msg += 'You are disconnected from ' + self.peer + '\n'
         self.peer = ''
-
+    
+    def error(self, msg, error_rate):
+        msg = list(msg)
+        for i in range(len(msg)):
+            point = random.uniform(0, 1)
+            if point < error_rate:
+                if msg[i].isdigit():
+                    new_range = list(string.digits)
+                    new_range.remove(msg[i])
+                    #print(new_range)
+                    msg[i] = random.choice(new_range)
+                if msg[i].isalpha():
+                    new_range = list(string.ascii_lowercase)
+                    new_range.remove(msg[i])
+                    #print(new_range)
+                    msg[i] = random.choice(new_range)
+                
+        msg = ''.join(msg)
+        return msg
+        
+        
+    
     def proc(self, my_msg, peer_code, peer_msg, world):
         self.out_msg = ''
         #==============================================================================
@@ -128,6 +151,8 @@ class ClientSM:
 # This is event handling instate "S_CHATTING"
 #==============================================================================
         elif self.state == S_CHATTING:
+            direction_list = ['left', 'right', 'up', 'down']
+            
             pygame.event.pump()
             pressed = pygame.key.get_pressed()
 
@@ -155,7 +180,8 @@ class ClientSM:
                 self.peer = ''
 
             if len(my_msg) > 0:  # my stuff going out
-                mysend(self.s, M_EXCHANGE + "[" + self.me + "] " + my_msg)
+                my_msg = self.error(my_msg, 0.2)
+                mysend(self.s, M_EXCHANGE + "[" + self.me + "]:" + my_msg)
                 if my_msg == 'bye':
                     self.disconnect()
                     self.state = S_LOGGEDIN
@@ -169,7 +195,8 @@ class ClientSM:
                     world.start()
                 else:
                     spltmsg = peer_msg.split(":")
-                    world.players[spltmsg[0]].changeDirection(spltmsg[1])
+                    if spltmsg[1] in direction_list:
+                        world.players[spltmsg[0]].changeDirection(spltmsg[1])
                     self.out_msg += peer_msg
 
             # I got bumped out
@@ -190,3 +217,5 @@ class ClientSM:
             print_state(self.state)
 
         return self.out_msg
+
+        
