@@ -106,13 +106,12 @@ class Server:
                     the_guys = self.group.list_me(from_name)
                     msg = M_CONNECT + 'ok'
                     mysend(from_sock, msg)
-                    for g in the_guys:
-                        if g not in self.init_pos:
-                            self.init_pos[g] = (
-                                random.randint(
-                                    30, (gc.WINWIDTH // gc.GRID_SIZE) - 30),
-                                random.randint(30, (gc.WINHEIGHT //
-                                                    gc.GRID_SIZE)) - 30)
+                    if from_name not in self.init_pos:
+                        self.init_pos[from_name] = (
+                            random.randint(
+                                30, (gc.WINWIDTH // gc.GRID_SIZE) - 30),
+                            random.randint(30, (gc.WINHEIGHT //
+                                                gc.GRID_SIZE)) - 30)
                     for g in the_guys:
                         to_sock = self.logged_name2sock[g]
                         mysend(to_sock, M_CONNECT + str(self.init_pos))

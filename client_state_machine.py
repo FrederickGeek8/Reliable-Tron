@@ -8,7 +8,6 @@ import pygame
 import random
 import ast
 import string
-import random
 from chat_utils import *
 
 
@@ -53,7 +52,7 @@ class ClientSM:
         mysend(self.s, msg)
         self.out_msg += 'You are disconnected from ' + self.peer + '\n'
         self.peer = ''
-    
+
     def error(self, msg, error_rate):
         msg = list(msg)
         for i in range(len(msg)):
@@ -69,12 +68,12 @@ class ClientSM:
                     new_range.remove(msg[i])
                     #print(new_range)
                     msg[i] = random.choice(new_range)
-                
+
         msg = ''.join(msg)
         return msg
-        
-        
-    
+
+
+
     def proc(self, my_msg, peer_code, peer_msg, world):
         self.out_msg = ''
         #==============================================================================
@@ -152,7 +151,7 @@ class ClientSM:
 #==============================================================================
         elif self.state == S_CHATTING:
             direction_list = ['left', 'right', 'up', 'down']
-            
+
             pygame.event.pump()
             pressed = pygame.key.get_pressed()
 
@@ -217,5 +216,3 @@ class ClientSM:
             print_state(self.state)
 
         return self.out_msg
-
-        
