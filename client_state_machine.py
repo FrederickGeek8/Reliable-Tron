@@ -257,9 +257,10 @@ class ClientSM:
                     world.start()
                 else:
                     spltmsg = peer_msg.split(":")
-                    spltmsg[1] = self.decode_pinpoint(ast.literal_eval(spltmsg[1]))
                     if spltmsg[1] in direction_list:
                         world.players[spltmsg[0]].changeDirection(spltmsg[1])
+                    else:
+                        spltmsg[1] = self.decode_pinpoint(ast.literal_eval(spltmsg[1]))
                     self.out_msg = self.out_msg + spltmsg[0] + ":" + spltmsg[1]
                     
 
