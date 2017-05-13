@@ -3,6 +3,7 @@ import socket
 import select
 import sys
 import string
+import math
 import random
 import indexer
 import pickle as pkl
@@ -38,6 +39,21 @@ class Server:
         sock.setblocking(0)
         self.new_clients.append(sock)
         self.all_sockets.append(sock)
+
+    def addPlayer(self, name):
+        numplayers = len(self.init_pos) + 1
+
+        x = 0
+        if(math.cos((math.pi / 4) + ((math.pi * numplayers) / 2)) < 0):
+            x = 30
+        else:
+            x = (gc.WINWIDTH // (gc.GRID_SIZE + 1)) - 30
+
+        dist = math.ceil(numplayers / 2)
+        if numplayers % 2 == 0:
+            self.init_pos[name] = (x, dist * 5)
+        else:
+            self.init_pos[name] = (x, (gc.WINHEIGHT // (gc.GRID_SIZE + 1)) - (dist * 5))
 
     def login(self, sock):
         #read the msg that should have login code plus username
@@ -108,18 +124,10 @@ class Server:
                     mysend(from_sock, msg)
 
                     if to_name not in self.init_pos:
-                        self.init_pos[to_name] = (
-                            random.randint(30,
-                                           (gc.WINWIDTH // gc.GRID_SIZE) - 30),
-                            random.randint(30, (gc.WINHEIGHT // gc.GRID_SIZE
-                                                )) - 30)
+                        self.addPlayer(to_name)
 
                     if from_name not in self.init_pos:
-                        self.init_pos[from_name] = (
-                            random.randint(30,
-                                           (gc.WINWIDTH // gc.GRID_SIZE) - 30),
-                            random.randint(30, (gc.WINHEIGHT // gc.GRID_SIZE
-                                                )) - 30)
+                        self.addPlayer(from_name)
                     for g in the_guys:
                         to_sock = self.logged_name2sock[g]
                         mysend(to_sock, M_CONNECT + str(self.init_pos))
