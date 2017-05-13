@@ -7,7 +7,9 @@ Created on Sun Apr  5 00:00:32 2015
 import pygame
 import random
 import ast
-import string
+import random
+import math
+import numpy as np
 from chat_utils import *
 
 
@@ -53,25 +55,87 @@ class ClientSM:
         self.out_msg += 'You are disconnected from ' + self.peer + '\n'
         self.peer = ''
 
-    def error(self, msg, error_rate):
-        msg = list(msg)
-        for i in range(len(msg)):
-            point = random.uniform(0, 1)
-            if point < error_rate:
-                if msg[i].isdigit():
-                    new_range = list(string.digits)
-                    new_range.remove(msg[i])
-                    #print(new_range)
-                    msg[i] = random.choice(new_range)
-                if msg[i].isalpha():
-                    new_range = list(string.ascii_lowercase)
-                    new_range.remove(msg[i])
-                    #print(new_range)
-                    msg[i] = random.choice(new_range)
+    def pinpoint(self, msg):
+        new_list = list(msg)
+        dimension = math.ceil(math.sqrt(len(msg))) ** 2
+        sqrd_dimension = int(math.sqrt(dimension))
+    
+        #converting the message to optimal square matrix
+        new_list.extend(['0' for i in range(dimension - len(msg))])
+    
+        #print(new_list)
+    
+        new_list = [new_list[j:j+sqrd_dimension] for j in range(0, dimension, sqrd_dimension)]
+        
+        #row checksum
+        row_checksum = []
+        for j in range(sqrd_dimension):
+            new_row = [ord(new_list[j][k]) for k in range(sqrd_dimension)]
+            row_checksum.append(sum(new_row))
+        new_list.append(row_checksum)
+    
+        #column checksum 
+        column_checksum = []
+        for j in range(sqrd_dimension):
+            new_column = [ord(new_list[k][j]) for k in range(sqrd_dimension)]
+            column_checksum.append(sum(new_column))
+        new_list.append(column_checksum)
+    
+        return new_list
 
+
+    def decode_pinpoint(self, matrix):
+        msg = matrix[:-2] 
+        checksum = matrix[-2:]
+        sqrd_dimension = len(matrix[0])
+        print(msg)
+    
+        #Locating the error
+        new_row_checksum = []
+        new_column_checksum = []
+        for j in range(sqrd_dimension):
+            new_row = [ord(matrix[j][k]) for k in range(sqrd_dimension)]
+            new_row_checksum.append(sum(new_row))
+            new_column = [ord(matrix[k][j]) for k in range(sqrd_dimension)]
+            new_column_checksum.append(sum(new_column))
+        new_checksum = [new_row_checksum, new_column_checksum]    
+
+        checksum = np.matrix(checksum)
+        new_checksum = np.matrix(new_checksum)
+        difference_matrix = checksum - new_checksum
+        
+        points, differences = self.get_point(difference_matrix)
+    
+        try:
+            for i in range(len(points)):
+                msg[points[i][0]][points[i][1]] = chr(ord(msg[points[i][0]][points[i][1]]) + differences[i])
+        except:
+            pass
+   
+    
+        msg = [''.join(msg[i])for i in range(len(msg))]
         msg = ''.join(msg)
+        try:
+            index_of_0 = msg.index('0')
+            msg = msg[:index_of_0]
+        except:
+            pass
+        
+    
         return msg
 
+    def get_point(self, matrix):
+        differences = []
+        point_matrix = np.transpose(np.nonzero(matrix))
+        points = []
+        for i in point_matrix:
+            if i[0] == 0:
+                points.append([i[1]])
+            elif i[0] == 1:
+                for j in range(len(points)):
+                    points[j].append(i[1])
+                    differences.append(matrix[1].item(i[1]))
+        return points, differences
 
 
     def proc(self, my_msg, peer_code, peer_msg, world):
@@ -179,8 +243,7 @@ class ClientSM:
                 self.peer = ''
 
             if len(my_msg) > 0:  # my stuff going out
-                my_msg = self.error(my_msg, 0.2)
-                mysend(self.s, M_EXCHANGE + "[" + self.me + "]:" + my_msg)
+                mysend(self.s, M_EXCHANGE + "[" + self.me + "]:" + str(self.pinpoint(my_msg)))
                 if my_msg == 'bye':
                     self.disconnect()
                     self.state = S_LOGGEDIN
@@ -194,9 +257,11 @@ class ClientSM:
                     world.start()
                 else:
                     spltmsg = peer_msg.split(":")
+                    spltmsg[1] = self.decode_pinpoint(ast.literal_eval(spltmsg[1]))
                     if spltmsg[1] in direction_list:
                         world.players[spltmsg[0]].changeDirection(spltmsg[1])
-                    self.out_msg += peer_msg
+                    self.out_msg = self.out_msg + spltmsg[0] + ":" + spltmsg[1]
+                    
 
             # I got bumped out
             if peer_code == M_DISCONNECT:
