@@ -144,15 +144,32 @@ class Server:
                 said = msg[1:]
                 # said2 = text_proc(said, from_name)
                 # self.indices[from_name].add_msg_and_index(said2)
-                if said == "start":
-                    msg = M_START + msg
-                    people = the_guys[:]
-                else:
-                    people = the_guys[1:]
+                people = the_guys[1:]
                 for g in people:
                     to_sock = self.logged_name2sock[g]
                     # self.indices[g].add_msg_and_index(said2)
                     mysend(to_sock, msg)
+
+            elif code == M_DIRECTION:
+                from_name = self.logged_sock2name[from_sock]
+                the_guys = self.group.list_me(from_name)
+
+                # said2 = text_proc(said, from_name)
+                # self.indices[from_name].add_msg_and_index(said2)
+                people = the_guys[1:]
+                for g in people:
+                    to_sock = self.logged_name2sock[g]
+                    # self.indices[g].add_msg_and_index(said2)
+                    mysend(to_sock, msg)
+
+            elif code == M_START:
+                from_name = self.logged_sock2name[from_sock]
+                the_guys = self.group.list_me(from_name)
+
+                for g in the_guys:
+                    to_sock = self.logged_name2sock[g]
+                    # self.indices[g].add_msg_and_index(said2)
+                    mysend(to_sock, M_START + "okay")
 #==============================================================================
 #listing available peers
 #==============================================================================
