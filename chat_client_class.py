@@ -159,8 +159,8 @@ class Client:
                 WORLD.getWinner() + " wins! Connect to play again.", 1,
                 (0, 0, 0), (255, 255, 255))
             DISPLAYSURF.blit(label, (100, 100))
-        elif not WORLD.started:
+        elif not WORLD.started and WORLD.players == {}:
             myfont = pygame.font.SysFont("monospace", 50)
-            label = myfont.render("Connect to play.", 1,
+            label = myfont.render("Connect to play. Press enter to start.", 1,
                 (0, 0, 0), (255, 255, 255))
             DISPLAYSURF.blit(label, (100, 100))
