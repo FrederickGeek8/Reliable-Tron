@@ -8,7 +8,7 @@ def pinpoint(msg):
     sqrd_dimension = int(math.sqrt(dimension))
 
     #converting the message to optimal square matrix
-    new_list.extend(['0' for i in range(dimension - len(msg))])
+    new_list.extend([' ' for i in range(dimension - len(msg))])
 
     #print(new_list)
 
@@ -65,11 +65,6 @@ def decode_pinpoint(matrix):
 
     msg = [''.join(msg[i]) for i in range(len(msg))]
     msg = ''.join(msg)
-    try:
-        index_of_0 = msg.index('0')
-        msg = msg[:index_of_0]
-    except:
-        pass
     print(msg)
     return msg
 
