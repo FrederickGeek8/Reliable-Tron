@@ -111,7 +111,7 @@ class Client:
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
-        global DISPLAYSURF, FPSCLOCK, WORLD
+        global DISPLAYSURF, FPSCLOCK, WORLD, SPLASHSCREEN
         self.init_chat()
         self.system_msg += 'Welcome to ICS chat\n'
         self.system_msg += 'Please enter your name: '
@@ -127,6 +127,8 @@ class Client:
         DISPLAYSURF = pygame.display.set_mode((gc.WINWIDTH, gc.WINHEIGHT))
 
         FPSCLOCK = pygame.time.Clock()
+
+        SPLASHSCREEN = pygame.image.load('SplashScreen.jpg')
 
         pygame.display.set_caption(self.get_name())
 
@@ -160,7 +162,5 @@ class Client:
                 (0, 0, 0), (255, 255, 255))
             DISPLAYSURF.blit(label, (100, 100))
         elif not WORLD.started and WORLD.players == {}:
-            myfont = pygame.font.SysFont("monospace", 50)
-            label = myfont.render("Connect to play. Press enter to start.", 1,
-                (0, 0, 0), (255, 255, 255))
-            DISPLAYSURF.blit(label, (100, 100))
+            titleRect = SPLASHSCREEN.get_rect()
+            DISPLAYSURF.blit(SPLASHSCREEN, titleRect)

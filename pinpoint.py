@@ -38,7 +38,7 @@ def decode_pinpoint(matrix):
     msg = matrix[:-2]
     checksum = matrix[-2:]
     sqrd_dimension = len(matrix[0])
-    print(msg)
+    # print(msg)
 
     #Locating the error
     new_row_checksum = []
@@ -65,8 +65,7 @@ def decode_pinpoint(matrix):
 
     msg = [''.join(msg[i]) for i in range(len(msg))]
     msg = ''.join(msg)
-    print(msg)
-    return msg
+    return msg.strip()
 
 
 def get_point(matrix):
