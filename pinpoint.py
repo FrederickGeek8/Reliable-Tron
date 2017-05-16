@@ -1,5 +1,6 @@
 import math
 import random
+import string
 import numpy as np
 
 def pinpoint(msg):
@@ -81,6 +82,24 @@ def get_point(matrix):
                 differences.append(matrix[1].item(i[1]))
     return points, differences
 
+def produce_error(msg, rate=0.05):
+    for i in range(len(msg)-2):
+        for j in msg[1]:
+            point = random.uniform(0,1)
+            if point<rate:
+                print('change', [i,j])
+                new_list = list(string.printable)
+                new_list.remove(j)
+                j = random.choice(new_list)
+    return msg
+            
+                
+    
 if __name__ == '__main__':
-    myPinpoint = decode_pinpoint(pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}"))
+    msg = pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}")
+    msg1 = produce_error(msg)
+    print(msg)
+    print(msg1)
+    myPinpoint = decode_pinpoint(produce_error(pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}")))
     print(myPinpoint)
+    print(pinpoint(myPinpoint)== msg)
