@@ -123,14 +123,11 @@ class Client:
 
         pygame.init()
         FPSCLOCK = pygame.time.Clock()
-
         DISPLAYSURF = pygame.display.set_mode((gc.WINWIDTH, gc.WINHEIGHT))
-
         FPSCLOCK = pygame.time.Clock()
-
         SPLASHSCREEN = pygame.image.load('SplashScreen.jpg')
 
-        pygame.display.set_caption(self.get_name())
+        pygame.display.set_caption("Reliable Tron")
 
         WORLD = World(DISPLAYSURF)
         while self.sm.get_state() != S_OFFLINE:

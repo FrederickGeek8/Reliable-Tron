@@ -7,7 +7,3 @@ launch the game. Press ENTER to play!
 
 ### Requirements
 Python 3.X with **framework supported**. Must have `pygame` installed.
-
-### Limitations
-Unless there is additional time at the end of the project, this system will be limited
-to two players.
