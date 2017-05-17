@@ -15,7 +15,11 @@ class Player():
         return self.steps
 
     def changeDirection(self, direction):
+        # We want to disable turning back on yourself
+        directions = {"left": "right", "right": "left", "up": "down", "down": "up"}
         if self.direction == direction:
+            return False
+        if directions[direction] == self.direction:
             return False
         self.direction = direction
         return True

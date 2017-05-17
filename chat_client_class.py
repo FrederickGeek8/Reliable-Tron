@@ -113,7 +113,7 @@ class Client:
     def run_chat(self):
         global DISPLAYSURF, FPSCLOCK, WORLD, SPLASHSCREEN
         self.init_chat()
-        self.system_msg += 'Welcome to ICS chat\n'
+        self.system_msg += 'Welcome to Reliable Tron game and chat system\n'
         self.system_msg += 'Please enter your name: '
         self.output()
         while self.login() != True:
@@ -134,6 +134,7 @@ class Client:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    self.quit()
                     sys.exit()
             DISPLAYSURF.fill((0, 0, 0))
             self.proc()
