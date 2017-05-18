@@ -2,10 +2,8 @@ import socket
 import time
 import sys
 import sysconfig
-import math
 import ast
-import numpy as np
-from pinpoint import *
+import pinpoint
 
 M_UNDEF = '0'
 M_LOGIN = '1'
@@ -22,13 +20,14 @@ M_POS = 'b'
 M_DIRECTION = 'c'
 
 if sys.platform == "darwin":
-    CHAT_IP = ''  #for Mac
+    CHAT_IP = ''  # for Mac
     if '--enable-framework' not in sysconfig.get_config_vars()['CONFIG_ARGS']:
         print(
-            "Error: Python not installed as framework. Please use proper Python version."
-        )
+            """Error: Python not installed as framework. Please use proper Python
+             version."""
+             )
 else:
-    CHAT_IP = socket.gethostname()  #for PC
+    CHAT_IP = socket.gethostname()  # for PC
 
 CHAT_PORT = 1112
 SERVER = (CHAT_IP, CHAT_PORT)
@@ -66,8 +65,8 @@ def print_state(state):
 
 
 def mysend(s, msg):
-    #append size to message and send it
-    msg = str(pinpoint(msg))
+    # append size to message and send it
+    msg = str(pinpoint.encode_pinpoint(msg))
     msg = ('0' * SIZE_SPEC + str(len(msg)))[-SIZE_SPEC:] + str(msg)
     msg = msg.encode()
     total_sent = 0
@@ -80,7 +79,7 @@ def mysend(s, msg):
 
 
 def myrecv(s):
-    #receive size first
+    # receive size first
     size = ''
     while len(size) < SIZE_SPEC:
         text = s.recv(SIZE_SPEC - len(size)).decode()
@@ -89,7 +88,7 @@ def myrecv(s):
             return ('')
         size += text
     size = int(size)
-    #now receive message
+    # now receive message
     msg = ''
     while len(msg) < size:
         text = s.recv(size - len(msg)).decode()
@@ -97,8 +96,8 @@ def myrecv(s):
             print('disconnected')
             break
         msg += text
-    #print ('received '+message)
-    return decode_pinpoint(ast.literal_eval(msg))
+    # print ('received '+message)
+    return pinpoint.decode_pinpoint(ast.literal_eval(msg))
 
 
 def text_proc(text, user):

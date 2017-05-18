@@ -1,4 +1,3 @@
-import time
 import socket
 import select
 import sys
@@ -29,8 +28,8 @@ class Client:
     def init_chat(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # if len(argv) > 1, we assume they're giving an IP address to connect to
-        # else, use the localhost as defined in chat_utils.py
+        # if len(argv) > 1, we assume they're giving an IP address to connect
+        # to else, use the localhost as defined in chat_utils.py
         if len(sys.argv) > 1:
             alt_IP = sys.argv[-1]
             alt_SERVER = (alt_IP, CHAT_PORT)
@@ -106,8 +105,9 @@ class Client:
     def drawGrid(self):
         for y in range(gc.WINHEIGHT // gc.GRID_SIZE):
             for x in range(gc.WINWIDTH // gc.GRID_SIZE):
-                rect = pygame.Rect(x * (gc.GRID_SIZE + 1), y * (gc.GRID_SIZE + 1),
-                                   gc.GRID_SIZE, gc.GRID_SIZE)
+                rect = pygame.Rect(x * (gc.GRID_SIZE + 1),
+                                   y * (gc.GRID_SIZE + 1), gc.GRID_SIZE,
+                                   gc.GRID_SIZE)
                 pygame.draw.rect(DISPLAYSURF, (255, 255, 255), rect)
 
     def run_chat(self):
@@ -116,7 +116,7 @@ class Client:
         self.system_msg += 'Welcome to Reliable Tron game and chat system\n'
         self.system_msg += 'Please enter your name: '
         self.output()
-        while self.login() != True:
+        while self.login() is not True:
             self.output()
         self.system_msg += 'Welcome, ' + self.get_name() + '!'
         self.output()
@@ -144,16 +144,16 @@ class Client:
             FPSCLOCK.tick(gc.FPS)
         self.quit()
 
-#==============================================================================
+# ==============================================================================
 # main processing loop
-#==============================================================================
+# ==============================================================================
 
     def proc(self):
         self.drawGrid()
         my_msg, peer_code, peer_msg = self.get_msgs()
         self.system_msg += self.sm.proc(my_msg, peer_code, peer_msg, WORLD)
         WORLD.draw()
-        if WORLD.getWinner() != None:
+        if WORLD.getWinner() is not None:
             myfont = pygame.font.SysFont("monospace", 50)
             label = myfont.render(
                 WORLD.getWinner() + " wins! Connect to play again.", 1,

@@ -3,29 +3,30 @@ import random
 import string
 import numpy as np
 
-def pinpoint(msg):
+
+def encode_pinpoint(msg):
     new_list = list(msg)
     dimension = math.ceil(math.sqrt(len(msg)))**2
     sqrd_dimension = int(math.sqrt(dimension))
 
-    #converting the message to optimal square matrix
+    # converting the message to optimal square matrix
     new_list.extend([' ' for i in range(dimension - len(msg))])
 
-    #print(new_list)
+    # print(new_list)
 
     new_list = [
         new_list[j:j + sqrd_dimension]
         for j in range(0, dimension, sqrd_dimension)
     ]
 
-    #row checksum
+    # row checksum
     row_checksum = []
     for j in range(sqrd_dimension):
         new_row = [ord(new_list[j][k]) for k in range(sqrd_dimension)]
         row_checksum.append(sum(new_row))
     new_list.append(row_checksum)
 
-    #column checksum
+    # column checksum
     column_checksum = []
     for j in range(sqrd_dimension):
         new_column = [ord(new_list[k][j]) for k in range(sqrd_dimension)]
@@ -41,7 +42,7 @@ def decode_pinpoint(matrix):
     sqrd_dimension = len(matrix[0])
     # print(msg)
 
-    #Locating the error
+    # Locating the error
     new_row_checksum = []
     new_column_checksum = []
     for j in range(sqrd_dimension):
@@ -82,24 +83,25 @@ def get_point(matrix):
                 differences.append(matrix[1].item(i[1]))
     return points, differences
 
+
 def produce_error(msg, rate=0.05):
-    for i in range(len(msg)-2):
+    for i in range(len(msg) - 2):
         for j in msg[1]:
-            point = random.uniform(0,1)
-            if point<rate:
-                print('change', [i,j])
+            point = random.uniform(0, 1)
+            if point < rate:
+                print('change', [i, j])
                 new_list = list(string.printable)
                 new_list.remove(j)
                 j = random.choice(new_list)
     return msg
-            
-                
-    
+
+
 if __name__ == '__main__':
     msg = pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}")
     msg1 = produce_error(msg)
     print(msg)
     print(msg1)
-    myPinpoint = decode_pinpoint(produce_error(pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}")))
+    myPinpoint = decode_pinpoint(
+        produce_error(pinpoint("{'Fred': (30, 67), 'Jeff': (30, 5)}")))
     print(myPinpoint)
-    print(pinpoint(myPinpoint)== msg)
+    print(pinpoint(myPinpoint) == msg)
