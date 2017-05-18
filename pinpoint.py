@@ -89,7 +89,7 @@ def produce_error(msg, rate=0.05):
         for j in msg[1]:
             point = random.uniform(0, 1)
             if point < rate:
-                print('change', [i, j])
+                # print('change', [i, j])
                 new_list = list(string.printable)
                 new_list.remove(j)
                 j = random.choice(new_list)
